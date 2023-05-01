@@ -13,7 +13,7 @@ type BalanceEntry struct {
 	ID           int64
 	Name         string
 	Amount       string
-	Type         string
+	EntryType    string
 	ExternalInfo sql.NullString
 	CreatedAt    time.Time
 }

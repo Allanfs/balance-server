@@ -7,10 +7,51 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"time"
 )
 
+const createEntry = `-- name: CreateEntry :exec
+INSERT INTO balance.entry (name, amount, entry_type, external_info) VALUES ($1, $2, $3, $4)
+`
+
+type CreateEntryParams struct {
+	Name         string
+	Amount       string
+	EntryType    string
+	ExternalInfo sql.NullString
+}
+
+func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) error {
+	_, err := q.db.ExecContext(ctx, createEntry,
+		arg.Name,
+		arg.Amount,
+		arg.EntryType,
+		arg.ExternalInfo,
+	)
+	return err
+}
+
+const deleteEntry = `-- name: DeleteEntry :exec
+DELETE FROM balance.entry e WHERE id = $1
+`
+
+func (q *Queries) DeleteEntry(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteEntry, id)
+	return err
+}
+
+const deleteEntryByExternalInfo = `-- name: DeleteEntryByExternalInfo :exec
+DELETE FROM balance.entry e WHERE external_info = $1
+`
+
+func (q *Queries) DeleteEntryByExternalInfo(ctx context.Context, externalInfo sql.NullString) error {
+	_, err := q.db.ExecContext(ctx, deleteEntryByExternalInfo, externalInfo)
+	return err
+}
+
 const getEntries = `-- name: GetEntries :many
-SELECT id, name, amount, type, external_info, created_at from balance.entry
+SELECT id, name, amount, entry_type, external_info, created_at from balance.entry e
 `
 
 func (q *Queries) GetEntries(ctx context.Context) ([]BalanceEntry, error) {
@@ -26,7 +67,7 @@ func (q *Queries) GetEntries(ctx context.Context) ([]BalanceEntry, error) {
 			&i.ID,
 			&i.Name,
 			&i.Amount,
-			&i.Type,
+			&i.EntryType,
 			&i.ExternalInfo,
 			&i.CreatedAt,
 		); err != nil {
@@ -41,4 +82,189 @@ func (q *Queries) GetEntries(ctx context.Context) ([]BalanceEntry, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getEntriesByType = `-- name: GetEntriesByType :many
+SELECT id, name, amount, entry_type, external_info, created_at from balance.entry e where e.entry_type = $1
+`
+
+func (q *Queries) GetEntriesByType(ctx context.Context, entryType string) ([]BalanceEntry, error) {
+	rows, err := q.db.QueryContext(ctx, getEntriesByType, entryType)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BalanceEntry
+	for rows.Next() {
+		var i BalanceEntry
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Amount,
+			&i.EntryType,
+			&i.ExternalInfo,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEntry = `-- name: GetEntry :one
+SELECT id, name, amount, entry_type, external_info, created_at from balance.entry e where e.id = $1
+`
+
+func (q *Queries) GetEntry(ctx context.Context, id int64) (BalanceEntry, error) {
+	row := q.db.QueryRowContext(ctx, getEntry, id)
+	var i BalanceEntry
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Amount,
+		&i.EntryType,
+		&i.ExternalInfo,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getEntryByDate = `-- name: GetEntryByDate :many
+SELECT id, name, amount, entry_type, external_info, created_at from balance.entry e where created_at = $1
+`
+
+func (q *Queries) GetEntryByDate(ctx context.Context, createdAt time.Time) ([]BalanceEntry, error) {
+	rows, err := q.db.QueryContext(ctx, getEntryByDate, createdAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BalanceEntry
+	for rows.Next() {
+		var i BalanceEntry
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Amount,
+			&i.EntryType,
+			&i.ExternalInfo,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEntryByExternalInfo = `-- name: GetEntryByExternalInfo :many
+SELECT id, name, amount, entry_type, external_info, created_at from balance.entry e where external_info = $1
+`
+
+func (q *Queries) GetEntryByExternalInfo(ctx context.Context, externalInfo sql.NullString) ([]BalanceEntry, error) {
+	rows, err := q.db.QueryContext(ctx, getEntryByExternalInfo, externalInfo)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BalanceEntry
+	for rows.Next() {
+		var i BalanceEntry
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Amount,
+			&i.EntryType,
+			&i.ExternalInfo,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateEntry = `-- name: UpdateEntry :exec
+UPDATE balance.entry e SET name = $2, amount = $3, entry_type = $4, external_info = $5 WHERE id = $1
+`
+
+type UpdateEntryParams struct {
+	ID           int64
+	Name         string
+	Amount       string
+	EntryType    string
+	ExternalInfo sql.NullString
+}
+
+func (q *Queries) UpdateEntry(ctx context.Context, arg UpdateEntryParams) error {
+	_, err := q.db.ExecContext(ctx, updateEntry,
+		arg.ID,
+		arg.Name,
+		arg.Amount,
+		arg.EntryType,
+		arg.ExternalInfo,
+	)
+	return err
+}
+
+const updateEntryAmount = `-- name: UpdateEntryAmount :exec
+UPDATE balance.entry e SET amount = $2 WHERE id = $1
+`
+
+type UpdateEntryAmountParams struct {
+	ID     int64
+	Amount string
+}
+
+func (q *Queries) UpdateEntryAmount(ctx context.Context, arg UpdateEntryAmountParams) error {
+	_, err := q.db.ExecContext(ctx, updateEntryAmount, arg.ID, arg.Amount)
+	return err
+}
+
+const updateEntryExternalInfo = `-- name: UpdateEntryExternalInfo :exec
+UPDATE balance.entry e SET external_info = $2 WHERE id = $1
+`
+
+type UpdateEntryExternalInfoParams struct {
+	ID           int64
+	ExternalInfo sql.NullString
+}
+
+func (q *Queries) UpdateEntryExternalInfo(ctx context.Context, arg UpdateEntryExternalInfoParams) error {
+	_, err := q.db.ExecContext(ctx, updateEntryExternalInfo, arg.ID, arg.ExternalInfo)
+	return err
+}
+
+const updateEntryName = `-- name: UpdateEntryName :exec
+UPDATE balance.entry e SET name = $2 WHERE id = $1
+`
+
+type UpdateEntryNameParams struct {
+	ID   int64
+	Name string
+}
+
+func (q *Queries) UpdateEntryName(ctx context.Context, arg UpdateEntryNameParams) error {
+	_, err := q.db.ExecContext(ctx, updateEntryName, arg.ID, arg.Name)
+	return err
 }

@@ -8,3 +8,7 @@ tasks:
   run:
     cmds:
       - go run cmd/main.go
+
+  pg:
+    cmds:
+     - docker run --name pg-balance-server -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres

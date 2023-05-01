@@ -1,0 +1,20 @@
+POST http://localhost:3000/api/v1/lancamentos
+Content-Type: application/json
+
+{
+    "nome": "Lançamento 1",
+    "valor": 100.00,
+    "Tipo": "C"
+}
+
+###
+
+GET http://localhost:3000/api/v1/lancamentos
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/api/v1/lancamentos/1
+Content-Type: application/json
+
+###

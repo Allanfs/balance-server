@@ -3,8 +3,9 @@ package model
 type LancamentoID int64
 
 type Lancamento struct {
-	Id    LancamentoID
-	Nome  string
-	Valor float64
-	Tipo  NaturezaFinanceira
+	Id           LancamentoID       `json:"id"`
+	Nome         string             `json:"nome"`
+	Valor        float64            `json:"valor"`
+	Tipo         NaturezaFinanceira `json:"tipo"`
+	ExternalInfo string             `json:"external_info,omitempty"`
 }

@@ -17,9 +17,10 @@ func SetLancamentosRoutes(app fiber.Router) {
 }
 
 type NovoLancamentoRequest struct {
-	Nome  string
-	Valor float64
-	Tipo  model.NaturezaFinanceira `json:"tipo"`
+	Nome         string
+	Valor        float64
+	Tipo         model.NaturezaFinanceira `json:"tipo"`
+	ExternalInfo string                   `json:"external_info,omitempty"`
 }
 
 type NovoLancamentoResponse struct {
@@ -40,9 +41,10 @@ func CadastrarLancamento(c *fiber.Ctx) error {
 	}
 
 	lancamento := model.Lancamento{
-		Nome:  l.Nome,
-		Valor: l.Valor,
-		Tipo:  l.Tipo,
+		Nome:         l.Nome,
+		Valor:        l.Valor,
+		Tipo:         l.Tipo,
+		ExternalInfo: l.ExternalInfo,
 	}
 
 	err := lancamentos.CadastrarLancamento(c.Context(), &lancamento)
@@ -59,9 +61,38 @@ func CadastrarLancamento(c *fiber.Ctx) error {
 }
 
 func ListarLancamento(c *fiber.Ctx) error {
-	return c.SendStatus(http.StatusNotImplemented)
+
+	lanc, err := lancamentos.ListarLancamentos(c.Context())
+	if err != nil {
+		return c.
+			Status(http.StatusInternalServerError).
+			JSON(HttpError{err, "Falha ao listar lançamentos"})
+	}
+
+	return c.JSON(lanc)
+}
+
+type Lancamento struct {
+	Id           model.LancamentoID       `json:"id"`
+	Nome         string                   `json:"nome"`
+	Valor        float64                  `json:"valor"`
+	Tipo         model.NaturezaFinanceira `json:"tipo"`
+	ExternalInfo string                   `json:"external_info,omitempty"`
 }
 
 func ObterLancamento(c *fiber.Ctx) error {
-	return c.SendStatus(http.StatusNotImplemented)
+	id, err := c.ParamsInt("id")
+
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(HttpError{err, ":id deve ser inteiro"})
+	}
+
+	lancamento, err := lancamentos.ObterLancamento(c.Context(), model.LancamentoID(id))
+
+	c.Context().Logger().Printf("TODO: validar erro de não encontrado")
+
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(HttpError{err, "Falha ao obter lançamento"})
+	}
+	return c.Status(http.StatusOK).JSON(lancamento)
 }

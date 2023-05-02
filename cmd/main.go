@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/allanfs/balance-server/internal/app/domain/repository"
 	"github.com/allanfs/balance-server/internal/app/inbound"
 	"github.com/allanfs/balance-server/internal/app/infra"
 	"github.com/gofiber/fiber/v2"
@@ -14,6 +15,8 @@ func main() {
 
 	db, err := infra.StartPostgres()
 	FinishHim(err)
+
+	repository.Lancamentos = repository.NewLancamentosRepository(db)
 
 	defer db.Close()
 

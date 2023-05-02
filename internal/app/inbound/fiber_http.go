@@ -27,6 +27,14 @@ type NovoLancamentoResponse struct {
 	Id model.LancamentoID `json:"id"`
 }
 
+// CadastrarLancamento teste
+// informaçao aqui
+//	@router			/lancamentos [post]
+//	@Summary		Cadastra um lançamento
+//	@description	Informe o nome, valor (maior que zero) e tipo do lançamento (C, D ou N/A).
+//	@description	O campo external_info é opcional. Serve para clientes da API armazenarem informações que lhes sejam uteis.
+//	@param			req.body	body		NovoLancamentoRequest	true	"Objeto para cadastrar um novo lançamento"
+//	@success		200			{object}	NovoLancamentoResponse
 func CadastrarLancamento(c *fiber.Ctx) error {
 
 	l := new(NovoLancamentoRequest)
@@ -72,6 +80,9 @@ func ListarLancamento(c *fiber.Ctx) error {
 	return c.JSON(lanc)
 }
 
+// Lancaemtno model info
+//	@Description	User account information
+//	@Description	with user id and username
 type Lancamento struct {
 	Id           model.LancamentoID       `json:"id"`
 	Nome         string                   `json:"nome"`

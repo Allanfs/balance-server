@@ -1,0 +1,49 @@
+definitions:
+  inbound.NovoLancamentoRequest:
+    properties:
+      external_info:
+        type: string
+      nome:
+        type: string
+      tipo:
+        $ref: '#/definitions/model.NaturezaFinanceira'
+      valor:
+        type: number
+    type: object
+  inbound.NovoLancamentoResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  model.NaturezaFinanceira:
+    enum:
+    - C
+    - D
+    - N/A
+    type: string
+    x-enum-varnames:
+    - Credito
+    - Debito
+    - Indefinido
+info:
+  contact: {}
+paths:
+  /lancamentos:
+    post:
+      description: |-
+        Informe o nome, valor (maior que zero) e tipo do lançamento (C, D ou N/A).
+        O campo external_info é opcional. Serve para clientes da API armazenarem informações que lhes sejam uteis.
+      parameters:
+      - description: Objeto para cadastrar um novo lançamento
+        in: body
+        name: req.body
+        required: true
+        schema:
+          $ref: '#/definitions/inbound.NovoLancamentoRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/inbound.NovoLancamentoResponse'
+      summary: Cadastra um lançamento
+swagger: "2.0"

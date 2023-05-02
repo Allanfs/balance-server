@@ -1,0 +1,73 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/lancamentos": {
+            "post": {
+                "description": "Informe o nome, valor (maior que zero) e tipo do lançamento (C, D ou N/A).\nO campo external_info é opcional. Serve para clientes da API armazenarem informações que lhes sejam uteis.",
+                "summary": "Cadastra um lançamento",
+                "parameters": [
+                    {
+                        "description": "Objeto para cadastrar um novo lançamento",
+                        "name": "req.body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/inbound.NovoLancamentoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/inbound.NovoLancamentoResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "inbound.NovoLancamentoRequest": {
+            "type": "object",
+            "properties": {
+                "external_info": {
+                    "type": "string"
+                },
+                "nome": {
+                    "type": "string"
+                },
+                "tipo": {
+                    "$ref": "#/definitions/model.NaturezaFinanceira"
+                },
+                "valor": {
+                    "type": "number"
+                }
+            }
+        },
+        "inbound.NovoLancamentoResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.NaturezaFinanceira": {
+            "type": "string",
+            "enum": [
+                "C",
+                "D",
+                "N/A"
+            ],
+            "x-enum-varnames": [
+                "Credito",
+                "Debito",
+                "Indefinido"
+            ]
+        }
+    }
+}

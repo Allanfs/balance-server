@@ -13,8 +13,8 @@ SELECT * from balance.entry e where external_info = $1;
 -- name: GetEntryByDate :many
 SELECT * from balance.entry e where created_at = $1;
 
--- name: CreateEntry :exec
-INSERT INTO balance.entry (name, amount, entry_type, external_info) VALUES ($1, $2, $3, $4);
+-- name: CreateEntry :one
+INSERT INTO balance.entry (name, amount, entry_type, external_info) VALUES ($1, $2, $3, $4) RETURNING id;
 
 -- name: UpdateEntryName :exec
 UPDATE balance.entry e SET name = $2 WHERE id = $1;

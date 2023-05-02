@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-const createEntry = `-- name: CreateEntry :exec
-INSERT INTO balance.entry (name, amount, entry_type, external_info) VALUES ($1, $2, $3, $4)
+const createEntry = `-- name: CreateEntry :one
+INSERT INTO balance.entry (name, amount, entry_type, external_info) VALUES ($1, $2, $3, $4) RETURNING id
 `
 
 type CreateEntryParams struct {
@@ -22,14 +22,16 @@ type CreateEntryParams struct {
 	ExternalInfo sql.NullString
 }
 
-func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) error {
-	_, err := q.db.ExecContext(ctx, createEntry,
+func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createEntry,
 		arg.Name,
 		arg.Amount,
 		arg.EntryType,
 		arg.ExternalInfo,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deleteEntry = `-- name: DeleteEntry :exec

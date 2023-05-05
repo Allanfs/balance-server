@@ -1,6 +1,8 @@
 package inbound
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
 
 	"github.com/allanfs/balance-server/internal/app/domain/lancamentos"
@@ -16,6 +18,8 @@ func SetLancamentosRoutes(app fiber.Router) {
 	app.Get("/:id", ObterLancamento)
 
 	app.Delete("/:id", RemoverLancamento)
+
+	app.Patch("/:id", AtualizarLancamento)
 }
 
 type NovoLancamentoRequest struct {
@@ -135,6 +139,44 @@ func RemoverLancamento(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(HttpError{err, "Falha ao obter lançamento"})
+	}
+	return c.SendStatus(http.StatusOK)
+}
+
+// AtualizarLancamento
+//
+//	@router	/:id [Patch]
+func AtualizarLancamento(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(HttpError{err, ":id deve ser inteiro"})
+	}
+
+	l := new(NovoLancamentoRequest)
+
+	// TODO: validações
+	// nome não pode ser vazio
+	// valor deve ser maior que zero
+	// tipo tem que ser C, D ou N/A
+
+	if err := c.BodyParser(l); err != nil {
+		return c.JSON(HttpError{err, "Request body inválido"})
+	}
+
+	lancamento := model.Lancamento{
+		Nome:         l.Nome,
+		Valor:        l.Valor,
+		Tipo:         l.Tipo,
+		ExternalInfo: l.ExternalInfo,
+	}
+
+	err = lancamentos.Atualizar(c.Context(), model.LancamentoID(id), lancamento)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return c.SendStatus(http.StatusNotFound)
+	} else if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(HttpError{err, "Falha ao atualizar lançamento"})
 	}
 	return c.SendStatus(http.StatusOK)
 }

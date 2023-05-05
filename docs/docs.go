@@ -28,6 +28,9 @@ const docTemplate = `{
                         "description": "OK"
                     }
                 }
+            },
+            "patch": {
+                "responses": {}
             }
         },
         "/lancamentos": {

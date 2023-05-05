@@ -1,20 +1,38 @@
+### Cadastrar lançamento
 POST http://localhost:3000/api/v1/lancamentos
 Content-Type: application/json
 
 {
-    "nome": "Lançamento 1",
-    "valor": 100.00,
-    "Tipo": "C"
+    "nome": "Desconto negociado",
+    "valor": 15,
+    "Tipo": "C",
+    "external_info": "pedido 113"
 }
 
-###
+### Listar todos os lançamentos
 
 GET http://localhost:3000/api/v1/lancamentos
 Content-Type: application/json
 
-###
+### Listar um lançamento
 
-GET http://localhost:3000/api/v1/lancamentos/1
+GET http://localhost:3000/api/v1/lancamentos/3
 Content-Type: application/json
 
+### Remover um lançamento
+
+DELETE http://localhost:3000/api/v1/lancamentos/2
+Content-Type: application/json
+
+### Atualizar um lançamento
+
+POST http://localhost:3000/api/v1/lancamentos/3/update
+Content-Type: application/json
+
+{
+  "id": 3,
+  "nome": "Lançamento EDITADO",
+  "valor": 555.2,
+  "tipo": "C"
+}
 ###

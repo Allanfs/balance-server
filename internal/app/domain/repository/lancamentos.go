@@ -50,8 +50,14 @@ func (l *lancamentosRepositorySqlc) CadastrarLancamento(ctx context.Context, lan
 	return model.LancamentoID(id), nil
 }
 
-func (l *lancamentosRepositorySqlc) AlterarLancamento(_ context.Context, _ model.LancamentoID, _ model.Lancamento) error {
-	panic("not implemented") // TODO: Implement
+func (l *lancamentosRepositorySqlc) AlterarLancamento(ctx context.Context, id model.LancamentoID, lancamento model.Lancamento) error {
+	return l.sqlc.UpdateEntry(ctx, db.UpdateEntryParams{
+		ID:           int64(id),
+		Name:         lancamento.Nome,
+		Amount:       fmt.Sprintf("%.3f", lancamento.Valor),
+		EntryType:    string(lancamento.Tipo),
+		ExternalInfo: sql.NullString{String: lancamento.ExternalInfo, Valid: true},
+	})
 }
 
 func (l *lancamentosRepositorySqlc) BuscarLancamentos(ctx context.Context) ([]*model.Lancamento, error) {

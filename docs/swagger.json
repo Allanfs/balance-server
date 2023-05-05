@@ -16,6 +16,9 @@
                         "description": "OK"
                     }
                 }
+            },
+            "patch": {
+                "responses": {}
             }
         },
         "/lancamentos": {

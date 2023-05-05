@@ -2,6 +2,9 @@ package lancamentos
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 
 	"github.com/allanfs/balance-server/internal/app/domain/model"
 	"github.com/allanfs/balance-server/internal/app/domain/repository"
@@ -40,6 +43,23 @@ func Deletar(ctx context.Context, id model.LancamentoID) error {
 
 	return err
 }
+
+func Atualizar(ctx context.Context, id model.LancamentoID, l model.Lancamento) error {
+
+	existing, err := repository.Lancamentos.BuscarLancamentoPorId(ctx, id)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("lancamento não encontrado: %w", err)
+	} else if err != nil {
+		return err
+	}
+
+	if existing == nil {
+		return nil
+	}
+
+	l.Id = id
+	err = repository.Lancamentos.AlterarLancamento(ctx, id, l)
 
 	return err
 }

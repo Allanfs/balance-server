@@ -39,6 +39,8 @@ paths:
       summary: Remove um lançamento
     get:
       responses: {}
+    patch:
+      responses: {}
   /lancamentos:
     post:
       description: |-

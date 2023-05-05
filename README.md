@@ -24,3 +24,21 @@ task --list-all
 ```bash
 swag fmt && swag init
 ```
+
+## Roadmap
+
+### Comentários
+- Aplicação multitenant? A principio não pois o serviço poderá ser implantado com facilidade em cada sistema que precisar dele.
+- O banco de dados pode ser compartilhado com outras aplicações, a aplicação utiliza um schema proprio para operar.
+  - O nome do schema pode ser parametrizado no helm? no futuro, não é prioridade agora.
+
+---
+
+### Checklist
+
+- [x] CRUD de lançamentos
+- [ ] SDK http para ser usada por outros serviços
+- [ ] suporte a GRPC
+- [ ] tratar os de forma assincrona (receber via http, postar na fila e responder 200 se estiver tudo ok, um consumer vai fazer o cadastro dos dados)
+- [ ] criar deployment no K8S
+- [ ] criar deployment no helm-charts

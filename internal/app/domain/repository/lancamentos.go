@@ -88,8 +88,8 @@ func (l *lancamentosRepositorySqlc) BuscarLancamentoPorId(ctx context.Context, i
 
 }
 
-func (l *lancamentosRepositorySqlc) RemoverLancamento(_ context.Context, _ model.LancamentoID) error {
-	panic("not implemented") // TODO: Implement
+func (l *lancamentosRepositorySqlc) RemoverLancamento(ctx context.Context, id model.LancamentoID) error {
+	return l.sqlc.DeleteEntry(ctx, int64(id))
 }
 
 func (l *lancamentosRepositorySqlc) toFloat(s string) (float64, error) {

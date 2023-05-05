@@ -16,6 +16,20 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/:id": {
+            "get": {
+                "responses": {}
+            },
+            "delete": {
+                "description": "Remove o lançamento com base no seu ID\nwith user id and username",
+                "summary": "Remove um lançamento",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/lancamentos": {
             "post": {
                 "description": "Informe o nome, valor (maior que zero) e tipo do lançamento (C, D ou N/A).\nO campo external_info é opcional. Serve para clientes da API armazenarem informações que lhes sejam uteis.",

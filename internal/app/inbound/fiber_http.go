@@ -14,6 +14,8 @@ func SetLancamentosRoutes(app fiber.Router) {
 	app.Get("/", ListarLancamento)
 
 	app.Get("/:id", ObterLancamento)
+
+	app.Delete("/:id", RemoverLancamento)
 }
 
 type NovoLancamentoRequest struct {
@@ -29,6 +31,7 @@ type NovoLancamentoResponse struct {
 
 // CadastrarLancamento teste
 // informaçao aqui
+//
 //	@router			/lancamentos [post]
 //	@Summary		Cadastra um lançamento
 //	@description	Informe o nome, valor (maior que zero) e tipo do lançamento (C, D ou N/A).
@@ -81,6 +84,7 @@ func ListarLancamento(c *fiber.Ctx) error {
 }
 
 // Lancaemtno model info
+//
 //	@Description	User account information
 //	@Description	with user id and username
 type Lancamento struct {
@@ -91,6 +95,9 @@ type Lancamento struct {
 	ExternalInfo string                   `json:"external_info,omitempty"`
 }
 
+// ObterLancamento
+//
+//	@router	/:id [get]
 func ObterLancamento(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 
@@ -106,4 +113,28 @@ func ObterLancamento(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(HttpError{err, "Falha ao obter lançamento"})
 	}
 	return c.Status(http.StatusOK).JSON(lancamento)
+}
+
+// RemoverLancamento
+//
+//	@Summary		Remove um lançamento
+//	@Description	Remove o lançamento com base no seu ID
+//	@Description	with user id and username
+//	@router			/:id [delete]
+//	@success		200
+func RemoverLancamento(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(HttpError{err, ":id deve ser inteiro"})
+	}
+
+	err = lancamentos.Deletar(c.Context(), model.LancamentoID(id))
+
+	c.Context().Logger().Printf("TODO: validar erro de não encontrado")
+
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(HttpError{err, "Falha ao obter lançamento"})
+	}
+	return c.SendStatus(http.StatusOK)
 }

@@ -33,3 +33,13 @@ func ListarLancamentos(ctx context.Context) ([]*model.Lancamento, error) {
 
 	return l, err
 }
+
+func Deletar(ctx context.Context, id model.LancamentoID) error {
+
+	err := repository.Lancamentos.RemoverLancamento(ctx, id)
+
+	return err
+}
+
+	return err
+}

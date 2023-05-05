@@ -28,6 +28,17 @@ definitions:
 info:
   contact: {}
 paths:
+  /:id:
+    delete:
+      description: |-
+        Remove o lançamento com base no seu ID
+        with user id and username
+      responses:
+        "200":
+          description: OK
+      summary: Remove um lançamento
+    get:
+      responses: {}
   /lancamentos:
     post:
       description: |-
